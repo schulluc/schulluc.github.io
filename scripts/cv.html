@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Curriculum Vitae — Luca Schulz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    @page {
+      size: A4;
+      margin: 13mm 15.5mm 13mm 15.5mm;
+    }
+
+    :root {
+      --ink: #161616;
+      --body: #333333;
+      --muted: #6e6e6e;
+      --rule: #dcdcdc;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+      color: var(--ink);
+      font-family: "Google Sans", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      font-size: 9.3pt;
+      line-height: 1.4;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .page-wrap {
+      max-width: 179mm;
+      margin: 0 auto;
+    }
+
+    @media screen {
+      body {
+        background: #f4f4f4;
+        padding: 28px 16px;
+      }
+      .page-wrap {
+        background: #ffffff;
+        max-width: 210mm;
+        padding: 15mm 16mm;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+      }
+    }
+
+    /* Header */
+    header {
+      margin-bottom: 9pt;
+      padding-bottom: 7pt;
+      border-bottom: 1pt solid var(--ink);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12pt;
+      margin-bottom: 3pt;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 19pt;
+      font-weight: 500;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+    }
+
+    .role-tag {
+      font-size: 9.4pt;
+      color: var(--muted);
+      font-weight: 400;
+      white-space: nowrap;
+    }
+
+    .contact-bar {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 8pt;
+      font-size: 8.6pt;
+      color: var(--body);
+      white-space: nowrap;
+    }
+
+    .contact-bar a {
+      color: var(--body);
+      text-decoration: none;
+      border-bottom: 0.5pt solid #bbbbbb;
+    }
+
+    .dot {
+      color: #b8b8b8;
+    }
+
+    /* Profile summary — justified, exact 3 lines */
+    .summary {
+      margin: 0 0 9pt 0;
+      color: var(--body);
+      font-size: 9pt;
+      line-height: 1.44;
+      text-align: justify;
+      hyphens: none;
+    }
+
+    /* Sections */
+    section {
+      margin-bottom: 9pt;
+    }
+
+    h2 {
+      margin: 0 0 4.5pt 0;
+      padding-bottom: 2pt;
+      border-bottom: 0.6pt solid var(--rule);
+      font-size: 8.3pt;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--muted);
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+
+    /* Timeline rows */
+    .entry {
+      display: grid;
+      grid-template-columns: 76pt 1fr;
+      column-gap: 8pt;
+      margin-bottom: 4.8pt;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .entry:last-child {
+      margin-bottom: 0;
+    }
+
+    .date {
+      font-size: 8.55pt;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      padding-top: 0.5pt;
+      white-space: nowrap;
+    }
+
+    .entry-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 6pt;
+      font-size: 9.05pt;
+      white-space: nowrap;
+    }
+
+    .entry-title {
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .entry-org {
+      font-weight: 400;
+      color: var(--body);
+    }
+
+    .entry-loc {
+      font-size: 8.45pt;
+      color: var(--muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .entry-details {
+      margin: 1.5pt 0 0 0;
+      padding-left: 11pt;
+      color: var(--body);
+      font-size: 8.8pt;
+      line-height: 1.36;
+    }
+
+    .entry-details li {
+      margin-bottom: 0.8pt;
+    }
+
+    .entry-sub {
+      margin: 1pt 0 0 0;
+      color: var(--body);
+      font-size: 8.8pt;
+    }
+
+    /* Compact single-line timeline (awards, talks) */
+    .compact-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2.2pt;
+    }
+
+    .compact-row {
+      display: grid;
+      grid-template-columns: 32pt 1fr;
+      column-gap: 8pt;
+      font-size: 8.8pt;
+      line-height: 1.34;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .compact-year {
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .compact-text {
+      color: var(--body);
+    }
+
+    .compact-text strong {
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    /* Publications */
+    .pub-note {
+      margin: -2pt 0 5.5pt 0;
+      font-size: 8.4pt;
+      color: var(--muted);
+    }
+
+    .pub-note a {
+      color: var(--ink);
+      text-decoration: none;
+      border-bottom: 0.5pt solid #bbbbbb;
+    }
+
+    .pub-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4.6pt;
+    }
+
+    .pub-item {
+      display: grid;
+      grid-template-columns: 18pt 1fr;
+      column-gap: 4pt;
+      font-size: 8.75pt;
+      line-height: 1.38;
+      color: var(--body);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .pub-num {
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .pub-me {
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .pub-venue {
+      font-style: italic;
+      color: var(--ink);
+    }
+
+    /* Skills 3-column grid */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3pt 14pt;
+      font-size: 8.65pt;
+      color: var(--body);
+      break-inside: avoid;
+    }
+
+    .skill-item {
+      position: relative;
+      padding-left: 8pt;
+    }
+
+    .skill-item::before {
+      content: "·";
+      position: absolute;
+      left: 0;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    /* Split footer sections */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16pt;
+      break-inside: avoid;
+    }
+
+    .small-p {
+      margin: 0 0 3pt 0;
+      font-size: 8.75pt;
+      color: var(--body);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <header>
+      <div class="header-top">
+        <h1>Luca Schulz</h1>
+        <span class="role-tag">Laboratory Research Scientist - Google DeepMind</span>
+      </div>
+      <div class="contact-bar">
+        <span>London, United Kingdom</span>
+        <span class="dot">·</span>
+        <span>luca_schulz -at- hotmail -dot- com</span>
+        <span class="dot">·</span>
+        <a href="https://scholar.google.com/citations?user=amjx1kAAAAAJ">Google Scholar</a>
+        <span class="dot">·</span>
+        <a href="https://www.linkedin.com/in/schulluc/">LinkedIn</a>
+        <span class="dot">·</span>
+        <a href="https://orcid.org/0000-0002-4796-2587">ORCID</a>
+        <span class="dot">·</span>
+        <a href="https://x.com/schulluc">@schulluc</a>
+      </div>
+    </header>
+
+    <p class="summary">
+      Biochemist and enzyme engineer working at the interface of <em>de novo</em> enzyme design, biocatalysis, machine learning for biology, and molecular evolution. 8+ years of experience characterizing and engineering biological systems across scales—from automated high-throughput assays and cell-free prototyping to structural biology and enzyme kinetics.
+    </p>
+
+    <section>
+      <h2>Research &amp; Work Experience</h2>
+
+      <div class="entry">
+        <div class="date">08/2025 – present</div>
+        <div>
+          <div class="entry-head">
+            <div><span class="entry-title">Laboratory Research Scientist</span> <span class="entry-org">— Google DeepMind</span></div>
+            <span class="entry-loc">London, UK</span>
+          </div>
+          <ul class="entry-details">
+            <li>Design and validation of <em>de novo</em> enzymes.</li>
+            <li>AI × Biology skills, agent development, and frontier model evaluation on biological workflows.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="date">05/2025 – 07/2025</div>
+        <div>
+          <div class="entry-head">
+            <div><span class="entry-title">Research Scientist</span> <span class="entry-org">— Novonesis</span></div>
+            <span class="entry-loc">Copenhagen, DK</span>
+          </div>
+          <ul class="entry-details">
+            <li>Core R&amp;D protein engineering and characterization.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="date">06/2024 – 04/2025</div>
+        <div>
+          <div class="entry-head">
+            <div><span class="entry-title">EMBO Postdoctoral Fellow</span> <span class="entry-org">— University of Manchester (Green Lab)</span></div>
+            <span class="entry-loc">Manchester, UK</span>
+          </div>
+          <ul class="entry-details">
+            <li>Developing novel chemistries in enzymes via genetic code expansion and directed evolution.</li>
+            <li>Acquired independent fellowship funding and led research lines.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="date">01/2024 – 06/2024</div>
+        <div>
+          <div class="entry-head">
+            <div><span class="entry-title">Postdoctoral Researcher</span> <span class="entry-org">— Max Planck Institute Marburg (Erb Lab)</span></div>
+            <span class="entry-loc">Marburg, DE</span>
+          </div>
+          <ul class="entry-details">
+            <li>Conceptualized independent research lines and mentored junior graduate students.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="date">05/2020 – 12/2023</div>
+        <div>
+          <div class="entry-head">
+            <div><span class="entry-title">Doctoral Researcher</span> <span class="entry-org">— Max Planck Institute Marburg (Erb &amp; Hochberg Labs)</span></div>
+            <span class="entry-loc">Marburg, DE</span>
+          </div>
+          <ul class="entry-details">
+            <li>Led research on protein complex evolution published in <em>Science</em>, <em>NSMB</em>, and <em>The EMBO Journal</em>.</li>
+            <li>Initiated international collaborations, gave 14+ invited talks, and supervised seven students.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="date">10/2019 – 03/2020</div>
+        <div>
+          <div class="entry-head">
+            <div><span class="entry-title">Master's Thesis</span> <span class="entry-org">— Northwestern University (Jewett Lab)</span></div>
+            <span class="entry-loc">Evanston, IL, US</span>
+          </div>
+          <ul class="entry-details">
+            <li>Cell-free pathway engineering for fatty acid synthesis with LanzaTech (publication &amp; US patent).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="date">11/2017 – 08/2018</div>
+        <div>
+          <div class="entry-head">
+            <div><span class="entry-title">Bachelor's Thesis</span> <span class="entry-org">— Max Planck Institute Marburg (Erb Lab)</span></div>
+            <span class="entry-loc">Marburg, DE</span>
+          </div>
+          <ul class="entry-details">
+            <li>Anaerobic enzyme variant production and screening protocols (two co-authored publications).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Education</h2>
+
+      <div class="entry">
+        <div class="date">05/2020 – 12/2023</div>
+        <div>
+          <div class="entry-head">
+            <div><span class="entry-title">PhD in Biology (Biochemistry and Synthetic Metabolism)</span> <span class="entry-org">— Max Planck Institute Marburg</span></div>
+            <span class="entry-loc">Marburg, DE</span>
+          </div>
+          <p class="entry-sub">Graduated with honors (<em>summa cum laude</em>).</p>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="date">09/2018 – 04/2020</div>
+        <div>
+          <div class="entry-head">
+            <div><span class="entry-title">MSc in Chemical Biology</span> <span class="entry-org">— ETH Zurich</span></div>
+            <span class="entry-loc">Zurich, CH</span>
+          </div>
+          <p class="entry-sub">Graduated with honors.</p>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="date">10/2015 – 05/2018</div>
+        <div>
+          <div class="entry-head">
+            <div><span class="entry-title">BSc in Biology</span> <span class="entry-org">— University of Marburg</span></div>
+            <span class="entry-loc">Marburg, DE</span>
+          </div>
+          <p class="entry-sub">Focus on Biochemistry and Microbiology.</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="break-inside: avoid; page-break-inside: avoid;">
+      <h2>Honours, Fellowships &amp; Grants</h2>
+      <div class="compact-list">
+        <div class="compact-row"><span class="compact-year">2025</span><span class="compact-text"><strong>Doctoral Award</strong>, Philipps University Marburg</span></div>
+        <div class="compact-row"><span class="compact-year">2024</span><span class="compact-text"><strong>International Birnstiel Award</strong>, Max Birnstiel Foundation &amp; Research Institute of Molecular Pathology (IMP)</span></div>
+        <div class="compact-row"><span class="compact-year">2024</span><span class="compact-text"><strong>EMBO Postdoctoral Fellowship</strong>, European Molecular Biology Organization (EMBO)</span></div>
+        <div class="compact-row"><span class="compact-year">2024</span><span class="compact-text"><strong>GBM PhD Award</strong>, German Society for Biochemistry and Molecular Biology (GBM)</span></div>
+        <div class="compact-row"><span class="compact-year">2022</span><span class="compact-text"><strong>Add-on Fellowship for Interdisciplinary Life Science</strong>, Joachim Herz Stiftung</span></div>
+        <div class="compact-row"><span class="compact-year">2022</span><span class="compact-text"><strong>Poster Prize</strong>, APFED 2022 Conference</span></div>
+        <div class="compact-row"><span class="compact-year">2022</span><span class="compact-text"><strong>Travel Grant</strong>, Refeyn</span></div>
+        <div class="compact-row"><span class="compact-year">2021</span><span class="compact-text"><strong>Doctoral Scholarship</strong>, Studienstiftung des deutschen Volkes (declined)</span></div>
+        <div class="compact-row"><span class="compact-year">2021</span><span class="compact-text"><strong>Presentation Prize</strong>, It Ma(t)ters Conference</span></div>
+        <div class="compact-row"><span class="compact-year">2020</span><span class="compact-text"><strong>Rainer Rudolph Prize</strong>, Rainer Rudolph Stiftung</span></div>
+        <div class="compact-row"><span class="compact-year">2019</span><span class="compact-text"><strong>Master's Thesis Grant</strong>, Zeno Karl Schindler Foundation</span></div>
+        <div class="compact-row"><span class="compact-year">2019</span><span class="compact-text"><strong>ETH Travel Grant</strong>, ETH Zurich</span></div>
+      </div>
+    </section>
+
+    <section style="page-break-before: always; break-before: page;">
+      <h2>Publications &amp; Preprints</h2>
+      <p class="pub-note">* denotes equal contribution. Full and up-to-date list on <a href="https://scholar.google.com/citations?user=amjx1kAAAAAJ">Google Scholar</a>.</p>
+      <ol class="pub-list">
+        <li class="pub-item">
+          <span class="pub-num">15.</span>
+          <span>Wu Z.*, Abramson J.*, Frerix T.*, Chu A.E.*, Zhang R.K.*, <span class="pub-me">Schulz L.*</span>, et al. Designing enzymes for new-to-nature chemistry and non-natural substrates with AlphaProtein Novo. (2026) <span class="pub-venue">bioRxiv</span>.</span>
+        </li>
+        <li class="pub-item">
+          <span class="pub-num">14.</span>
+          <span>Google DeepMind Science Team (incl. <span class="pub-me">Schulz L.</span>). Science Skills for Antigravity: Towards Efficient and Reliable Scientific Workflows. (2026) <span class="pub-venue">arXiv / Technical Report</span>.</span>
+        </li>
+        <li class="pub-item">
+          <span class="pub-num">13.</span>
+          <span>Küffner A.M., Pommerenke B., Kley L., Ng J.Z.Y., Prinz S., Tinzl-Zechner M., <span class="pub-me">Schulz L.</span>, Claus P., Paczia N., Chotel T., Klose M., Zarzycki J., Hochberg G.K.A., Erb T.J. Bottom-up reconstruction of synthetic pyrenoids provides insights into the mechanisms and evolution of carbon concentration by EPYC1 proteins. (2026) <span class="pub-venue">Nature Plants</span> 12, 1622–1636.</span>
+        </li>
+        <li class="pub-item">
+          <span class="pub-num">12.</span>
+          <span>Otto F., Westedt H., Franzeck K.P., Zarzycki J., Küffner A.M., <span class="pub-me">Schulz L.</span>, Prinz S., Paczia N., Claus P., Hochberg G.K.A., Erb T.J. Form IF Rubiscos include highly active, specific, and small subunit-independent enzymes. (2026) <span class="pub-venue">bioRxiv</span>.</span>
+        </li>
+        <li class="pub-item">
+          <span class="pub-num">11.</span>
+          <span>Guljamow A., Timm S., Wimmer V., <span class="pub-me">Schulz L.</span>, Hochberg G.K.A., Hagemann M., Dittmann E. Microcystin-driven control of the carbon-concentrating mechanism shapes CO<sub>2</sub> fixation dynamics in <em>Microcystis aeruginosa</em> PCC 7806. (2026) <span class="pub-venue">bioRxiv</span>.</span>
+        </li>
+        <li class="pub-item">
+          <span class="pub-num">10.</span>
+          <span>Ng J.Z.Y., Wiens D., <span class="pub-me">Schulz L.</span>, Hergenröder A., Küffner A.M., Geil C., Erb T.J., Hochberg G.K.A. Origin of chaperone dependence and assembly complexity in Rubisco's biogenesis. (2025) <span class="pub-venue">bioRxiv</span>.</span>
+        </li>
+        <li class="pub-item">
+          <span class="pub-num">9.</span>
+          <span><span class="pub-me">Schulz L.</span>, Zarzycki J., Steinchen W., Hochberg G.K.A., Erb T.J. Layered entrenchment maintains essentiality in the evolution of Form I Rubisco complexes. (2025) <span class="pub-venue">The EMBO Journal</span> 44, 269–280.</span>
+        </li>
+        <li class="pub-item">
+          <span class="pub-num">8.</span>
+          <span><span class="pub-me">Schulz L.*</span>, Schmidt F.V.*, Zarzycki J., Oehlmann N.N., Prinz S., Erb T.J., Rebelein J.G. Structural insights into the iron nitrogenase complex. (2023) <span class="pub-venue">Nature Structural &amp; Molecular Biology</span> 30, 1463–1472.</span>
+        </li>
+        <li class="pub-item">
+          <span class="pub-num">7.</span>
+          <span>Marchal D.G., <span class="pub-me">Schulz L.</span>, Schuster I., Ivanovska I., Paczia N., Prinz S., Zarzycki J., Erb T.J. Machine learning-supported enzyme engineering toward improved CO<sub>2</sub>-fixation of glycolyl-CoA carboxylase. (2023) <span class="pub-venue">ACS Synthetic Biology</span> 12, 3521–3530.</span>
+        </li>
+        <li class="pub-item">
+          <span class="pub-num">6.</span>
+          <span>Bierbaumer S., Nattermann M.*, <span class="pub-me">Schulz L.*</span>, Zschoche R., Erb T.J., Winkler C.K., Tinzl M., Glueck S.M. Enzymatic CO<sub>2</sub> fixation: from nature to application. (2023) <span class="pub-venue">Chemical Reviews</span> 123, 5702–5754.</span>
+        </li>
+        <li class="pub-item">
+          <span class="pub-num">5.</span>
+          <span><span class="pub-me">Schulz L.</span>, Guo Z., Zarzycki J., Steinchen W., Schuller J.M., Heimerl T., Prinz S., Müller-Cajar O., Erb T.J., Hochberg G.K.A. Evolution of increased complexity and specificity at the dawn of Form I Rubiscos. (2022) <span class="pub-venue">Science</span> 378, 155–160. <em>(Highlighted by a Science Perspective &amp; Faculty Opinions)</em></span>
+        </li>
+        <li class="pub-item">
+          <span class="pub-num">4.</span>
+          <span><span class="pub-me">Schulz L.*</span>, Sendker F.L.*, Hochberg G.K.A. Non-adaptive complexity and biochemical function. (2022) <span class="pub-venue">Current Opinion in Structural Biology</span> 73, 102339.</span>
+        </li>
+        <li class="pub-item">
+          <span class="pub-num">3.</span>
+          <span>Vögeli B., <span class="pub-me">Schulz L.</span>, Garg S., Tarasava K., Clomburg J., Gonnot A., Moully E.H., Kimmel B.R., Mrksich M., Karim A., Gonzalez R., Köpke M., Jewett M.C. Cell-free prototyping enables <em>in vivo</em> implementation of optimized reverse β-oxidation pathways in heterotrophic and autotrophic bacteria. (2022) <span class="pub-venue">Nature Communications</span> 13, 3058.</span>
+        </li>
+        <li class="pub-item">
+          <span class="pub-num">2.</span>
+          <span>Nattermann M.*, Burgener S.*, Pfister P., Chou A., <span class="pub-me">Schulz L.</span>, Lee S.H., Zarzycki J., Gonzalez R., Erb T.J. Engineering a highly efficient carboligase for synthetic one-carbon metabolism. (2021) <span class="pub-venue">ACS Catalysis</span> 11, 5396–5404.</span>
+        </li>
+        <li class="pub-item">
+          <span class="pub-num">1.</span>
+          <span>Cotton C.A.R., Bernhardsgrütter I., He H., Burgener S., <span class="pub-me">Schulz L.</span>, Paczia N., Dronsella B., Erban A., Toman S., Dempfle M., De Maria A., Kopka J., Lindner S.N., Erb T.J., Bar-Even A. Underground isoleucine biosynthesis pathways in <em>E. coli</em>. (2020) <span class="pub-venue">eLife</span> 9, e54207.</span>
+        </li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Patents</h2>
+      <div class="compact-list">
+        <div class="compact-row">
+          <span class="compact-year">2025</span>
+          <span class="compact-text">Jewett M.C., Vögeli B., <strong>Schulz L.</strong> <em>A cell-free bio-manufacturing platform for production of fatty acids and cannabinoids.</em> US Patent Application 18/251,604.</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Core Experimental &amp; Computational Skills</h2>
+      <div class="skills-grid">
+        <div class="skill-item">Enzyme kinetics, assays &amp; directed evolution</div>
+        <div class="skill-item">High-throughput screening &amp; Echo/Integra robotics</div>
+        <div class="skill-item">Ancestral sequence reconstruction &amp; phylogenetics</div>
+        <div class="skill-item">Bioinformatic &amp; ML protein design pipelines</div>
+        <div class="skill-item">Cryo-EM (CryoSPARC), X-ray &amp; mass photometry</div>
+        <div class="skill-item">Protein NMR (dynamics &amp; flexibility)</div>
+        <div class="skill-item">GC-MS, HPLC-MS, HPLC-RI &amp; radiometric assays</div>
+        <div class="skill-item">Bacterial, anaerobic &amp; cell-free protein synthesis</div>
+        <div class="skill-item">Golden Gate, Gibson &amp; modular pathway cloning</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Invited Talks, Seminars &amp; Conference Presentations</h2>
+      <div class="compact-list">
+        <div class="compact-row"><span class="compact-year">2025</span><span class="compact-text">Doctoral Award Ceremony, Philipps University Marburg, Germany <em>(Invited Talk)</em></span></div>
+        <div class="compact-row"><span class="compact-year">2024</span><span class="compact-text">Max Birnstiel Award Symposium, IMP Vienna, Austria <em>(Award Talk)</em></span></div>
+        <div class="compact-row"><span class="compact-year">2024</span><span class="compact-text">75th Mosbach Colloquium, GBM Award Lecture, Mosbach, Germany <em>(Award Talk)</em></span></div>
+        <div class="compact-row"><span class="compact-year">2023</span><span class="compact-text">CO<sub>2</sub> Assimilation in Plants Gordon Research Seminar (GRS), Tuscany, Italy <em>(Talk)</em></span></div>
+        <div class="compact-row"><span class="compact-year">2023</span><span class="compact-text">SKiPR — Sharing Knowledge in Photosynthesis Research, Wageningen, Netherlands <em>(Talk)</em></span></div>
+        <div class="compact-row"><span class="compact-year">2023</span><span class="compact-text">Joachim Herz Add-on Fellowship Meeting, Hamburg, Germany <em>(Poster)</em></span></div>
+        <div class="compact-row"><span class="compact-year">2022</span><span class="compact-text">NTU Seminar Series, Nanyang Technological University, Singapore <em>(Invited Talk)</em></span></div>
+        <div class="compact-row"><span class="compact-year">2022</span><span class="compact-text">IBL Seminar Series, Institute of Biology, Leiden University, Netherlands <em>(Invited Talk)</em></span></div>
+        <div class="compact-row"><span class="compact-year">2022</span><span class="compact-text">Ralph Bock Lab Retreat, Guest Speaker, Schloss Ringberg, Germany <em>(Invited Talk)</em></span></div>
+        <div class="compact-row"><span class="compact-year">2022</span><span class="compact-text">VAAM Annual Conference, Düsseldorf, Germany <em>(Talk)</em>; Refeyn &amp; CyanoWorld Webinars <em>(Talks)</em></span></div>
+        <div class="compact-row"><span class="compact-year">2022</span><span class="compact-text">Molecular Basis of One-Carbon Assimilation GRS, Southbridge, US &amp; APFED-22 <em>(Posters)</em></span></div>
+        <div class="compact-row"><span class="compact-year">2021</span><span class="compact-text">Frontiers in Protein Science Workshop, Rainer Rudolph Foundation, Munich, Germany <em>(Award Talk)</em></span></div>
+        <div class="compact-row"><span class="compact-year">2021</span><span class="compact-text">It Ma(t)ters Joint MPI Conference <em>(Talk)</em> &amp; EMBO Workshop: Predicting Evolution <em>(Poster)</em></span></div>
+        <div class="compact-row"><span class="compact-year">2020</span><span class="compact-text">60th Anniversary Meeting of the British Biophysical Society <em>(Talk)</em></span></div>
+      </div>
+    </section>
+
+    <div class="two-col">
+      <section>
+        <h2>Academic Service &amp; Teaching</h2>
+        <p class="small-p"><strong>Peer Review:</strong> Review Panelist, NASA FINESST-23 Fellowships (Microbiology); Referee for <em>Biochemistry</em> (6×) and <em>ChemBioChem</em> (3×).</p>
+        <p class="small-p"><strong>Teaching:</strong> Course Lecturer (2022–2023) &amp; Assistant (2021), <em>Microbial Ecology</em> M.Sc. Course, University of Marburg.</p>
+      </section>
+      <section>
+        <h2>Languages</h2>
+        <p class="small-p"><strong>German:</strong> Native &nbsp;·&nbsp; <strong>English:</strong> Fluent &nbsp;·&nbsp; <strong>French:</strong> Basic</p>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

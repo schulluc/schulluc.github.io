@@ -1,0 +1,157 @@
+:root {
+  --bg: #ffffff;
+  --text: #1a1a1a;
+  --body: #4a4a4a;
+  --muted: #8a8a8a;
+  --border: #dcdcdc;
+  --link: #1a1a1a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Google Sans", -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.viewport {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+/* Dynamic full-bleed protein stage taking all remaining screen height */
+.stage-area {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  padding: 8px 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fold-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 1160px;
+  background: var(--bg);
+}
+
+/* Minimal Google Sans footer anchored at the bottom */
+.site-footer {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 6px 24px 26px;
+  text-align: center;
+}
+
+.site-name {
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0 0 5px 0;
+  color: var(--text);
+}
+
+.site-bio {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--body);
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.site-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 14px;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.site-links a {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid #cccccc;
+  padding-bottom: 1px;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.site-links a:hover {
+  border-bottom-color: var(--text);
+}
+
+.sep {
+  color: #d0d0d0;
+  user-select: none;
+}
+
+@media (max-width: 600px) {
+  .stage-area {
+    padding: 4px 6px 0;
+  }
+
+  .site-footer {
+    padding: 4px 20px 20px;
+  }
+
+  .site-name {
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+
+  .site-bio {
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
+
+  .bio-break {
+    display: none;
+  }
+
+  .site-links {
+    font-size: 13px;
+    gap: 5px 11px;
+  }
+}
+
+/* Safety fallback for ultra-short landscape phone screens */
+@media (max-height: 430px) {
+  html,
+  body,
+  .viewport {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .stage-area {
+    height: 300px;
+  }
+}

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Luca Schulz — Biochemist &amp; Research Scientist at Google DeepMind</title>
+  <meta name="description" content="Luca Schulz — Biochemist and research scientist at Google DeepMind in London, working on de novo enzyme design, machine learning for biology, and protein evolution.">
+  <meta name="author" content="Luca Schulz">
+  <link rel="canonical" href="https://schulluc.github.io/">
+
+  <meta property="og:type" content="profile">
+  <meta property="og:title" content="Luca Schulz — Biochemist &amp; Research Scientist at Google DeepMind">
+  <meta property="og:description" content="Biochemist and research scientist at Google DeepMind in London, working on de novo enzyme design, machine learning for biology, and protein evolution.">
+  <meta property="og:url" content="https://schulluc.github.io/">
+  <meta property="og:site_name" content="Luca Schulz">
+  <meta property="profile:first_name" content="Luca">
+  <meta property="profile:last_name" content="Schulz">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@schulluc">
+  <meta name="twitter:creator" content="@schulluc">
+  <meta name="twitter:title" content="Luca Schulz — Biochemist &amp; Research Scientist at Google DeepMind">
+  <meta name="twitter:description" content="Biochemist and research scientist at Google DeepMind in London, working on de novo enzyme design, machine learning for biology, and protein evolution.">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Luca Schulz",
+    "url": "https://schulluc.github.io/",
+    "jobTitle": "Laboratory Research Scientist",
+    "description": "Biochemist and research scientist at Google DeepMind in London, working on de novo enzyme design, machine learning for biology, and protein evolution.",
+    "worksFor": {
+      "@type": "Organization",
+      "name": "Google DeepMind",
+      "url": "https://deepmind.google/"
+    },
+    "alumniOf": [
+      {
+        "@type": "ResearchOrganization",
+        "name": "Max Planck Institute for Terrestrial Microbiology"
+      },
+      {
+        "@type": "CollegeOrUniversity",
+        "name": "ETH Zurich"
+      },
+      {
+        "@type": "CollegeOrUniversity",
+        "name": "Philipps-Universität Marburg"
+      }
+    ],
+    "knowsAbout": [
+      "De novo enzyme design",
+      "Protein design",
+      "Biochemistry",
+      "Machine learning for biology",
+      "Protein evolution",
+      "Biocatalysis"
+    ],
+    "sameAs": [
+      "https://scholar.google.com/citations?user=amjx1kAAAAAJ",
+      "https://www.linkedin.com/in/schulluc/",
+      "https://x.com/schulluc",
+      "https://orcid.org/0000-0002-4796-2587",
+      "https://github.com/schulluc"
+    ]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=7">
+</head>
+<body>
+  <div class="viewport">
+    <div class="stage-area">
+      <div id="foldStage" class="fold-stage" aria-label="Spinning protein ribbon and ASCII structure"></div>
+    </div>
+
+    <footer class="site-footer">
+      <h1 class="site-name">Luca Schulz</h1>
+      <p class="site-bio">
+        Biochemist and research scientist at Google DeepMind in London, working on<br class="bio-break">
+        <em class="nowrap">de novo</em> enzyme design, machine learning for biology, and protein evolution.
+      </p>
+      <div class="site-links" aria-label="Contact and social links">
+        <a href="cv.pdf" target="_blank" rel="noopener">CV</a>
+        <span class="sep">·</span>
+        <a href="mailto:luca_schulz-at-hotmail-dot-com">Email</a>
+        <span class="sep">·</span>
+        <a href="https://scholar.google.com/citations?user=amjx1kAAAAAJ" target="_blank" rel="noopener me">Google Scholar</a>
+        <span class="sep">·</span>
+        <a href="https://www.linkedin.com/in/schulluc/" target="_blank" rel="noopener me">LinkedIn</a>
+        <span class="sep">·</span>
+        <a href="https://x.com/schulluc" target="_blank" rel="noopener me">Twitter</a>
+      </div>
+    </footer>
+  </div>
+
+  <script type="module">
+    import { createProteinFold } from "./protein/engine.js?v=7";
+    import PAB_AB from "./protein/structures/2pab-ab.js?v=7";
+    import TIM_A from "./protein/structures/1tim-a.js?v=7";
+    import { attachDiffusionScroll } from "./protein/diffusion.js?v=7";
+
+    const params = new URLSearchParams(window.location.search);
+    const noHoverMedia = window.matchMedia("(hover: none), (pointer: coarse)");
+
+    function resolveMode() {
+      if (params.has("mode")) return params.get("mode");
+      return noHoverMedia.matches ? "split" : "lens";
+    }
+
+    const period = params.has("period") ? Number(params.get("period")) : 16;
+    const stage = document.getElementById("foldStage");
+    const view = createProteinFold(stage, {
+      mode: resolveMode(),
+      splitPos: 0.50,
+      lensRadius: 0.30,
+      asciiStyle: "hybrid",
+      detail: 90,
+      zoom: 1.09,
+      lineWeight: 0.95,
+      haloWidth: 4.2,
+      depthFade: 0.0,
+      period,
+      tiltX: (18 * Math.PI) / 180,
+      hatchHelix: true,
+      slabStrand: true,
+    });
+
+    view.loadModel(PAB_AB);
+    window.proteinFold = view;
+
+    if (params.has("rotY")) {
+      view.setRotation(Number(params.get("rotY")));
+    }
+
+    const initStop = params.has("stop") ? Number(params.get("stop")) : 0;
+    window.proteinDiffusion = attachDiffusionScroll(view, {
+      baseModel: PAB_AB,
+      altModel: TIM_A,
+      initialStop: initStop,
+    });
+
+    noHoverMedia.addEventListener("change", () => {
+      view.set({ mode: resolveMode() });
+    });
+
+    if (params.has("lens")) {
+      const [lx, ly] = params.get("lens").split(",").map(Number);
+      view.setPointer(lx, ly, true);
+    }
+  </script>
+</body>
+</html>
