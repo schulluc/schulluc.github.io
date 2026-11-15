@@ -94,8 +94,8 @@ function extractContacts(model) {
 
 /**
  * Attach scroll-driven de novo protein diffusion & refolding trajectory:
- * Stop 0: 2PAB (prealbumin β-sandwich dimer) — 0% ASCII on mobile at rest
- * Stop 1: SE(3) disordered polypeptide diffusion prior + pairwise restraint graph (sweeps up to 50% ASCII)
+ * Stop 0: 2PAB (prealbumin β-sandwich dimer)
+ * Stop 1: SE(3) disordered polypeptide diffusion prior + pairwise restraint graph
  * Stop 2: 1TIM (de novo-style (β/α)8 TIM barrel enzyme)
  * Stop 3: SE(3) disordered polypeptide diffusion prior + pairwise restraint graph
  */
@@ -105,6 +105,7 @@ export function attachDiffusionScroll(view, { baseModel, altModel, initialStop =
   let dialSmooth = initialStop;
   let lastInputAt = -1e9;
   let isTouching = false;
+  let lensReleaseTimer = 0;
 
   // Measure natural bounding radii of both folded structures for seamless zero-jump scaling
   view.setModelFast(altModel, null, null);
@@ -232,10 +233,6 @@ export function attachDiffusionScroll(view, { baseModel, altModel, initialStop =
     const u = posMod(dialSmooth, NUM_STOPS);
     latestFrame = updateGeometry(u);
 
-    // Smoothly sweep ASCII into the protein (0% -> up to scrollMax=50%) upon scrolling
-    const asciiProgress = smoothstep(Math.min(1, Math.max(0, Math.abs(dialSmooth))));
-    view.setScrollFast(asciiProgress);
-
     return (
       isTouching ||
       Math.abs(dialTarget - dialSmooth) > 5e-4 ||
@@ -291,8 +288,8 @@ export function attachDiffusionScroll(view, { baseModel, altModel, initialStop =
   }
 
   view.set({ onTick, onBeforeMask });
-  onTick(0.016, performance.now());
   if (initialStop !== 0) {
+    onTick(0.016, performance.now());
     view.render();
   }
 
@@ -303,11 +300,7 @@ export function attachDiffusionScroll(view, { baseModel, altModel, initialStop =
     const delta = Math.abs(rawDy) >= Math.abs(rawDx) ? rawDy : rawDx;
     const dStops = Math.max(-0.55, Math.min(0.55, delta / 280));
 
-    if (view.getOptions().mode === "scroll") {
-      dialTarget = Math.max(0, dialTarget + dStops);
-    } else {
-      dialTarget += dStops;
-    }
+    dialTarget += dStops;
     lastInputAt = performance.now();
     view.nudgeSpin(dStops * 0.42, 0);
     view.kick();
@@ -322,16 +315,16 @@ export function attachDiffusionScroll(view, { baseModel, altModel, initialStop =
       view.kick();
     } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
       e.preventDefault();
-      const next = Math.round(dialTarget) - 1;
-      dialTarget = view.getOptions().mode === "scroll" ? Math.max(0, next) : next;
+      dialTarget = Math.round(dialTarget) - 1;
       lastInputAt = performance.now();
       view.nudgeSpin(-0.35, 0);
       view.kick();
     }
   }
 
-  // Full-page inertial touch scrolling across the entire viewport (including the protein stage)
+  // Full-page inertial touch scrolling + transient 30% finger ASCII spotlight lens
   let touchY = null;
+  let touchStartAt = 0;
   let touchLastT = 0;
   let touchVelStops = 0;
 
@@ -339,12 +332,23 @@ export function attachDiffusionScroll(view, { baseModel, altModel, initialStop =
     if (e.touches.length !== 1) {
       touchY = null;
       isTouching = false;
+      view.setTouchLens(0, 0, false);
       return;
     }
-    touchY = e.touches[0].clientY;
-    touchLastT = performance.now();
+    if (lensReleaseTimer) {
+      clearTimeout(lensReleaseTimer);
+      lensReleaseTimer = 0;
+    }
+    const t = e.touches[0];
+    touchY = t.clientY;
+    touchStartAt = touchLastT = performance.now();
     touchVelStops = 0;
     isTouching = true;
+
+    // Open the 30% ASCII spotlight near the finger (unless tapping directly on a footer link)
+    if (!e.target.closest("a")) {
+      view.setTouchLens(t.clientX, t.clientY, true);
+    }
   }
 
   function onTouchMove(e) {
@@ -352,17 +356,19 @@ export function attachDiffusionScroll(view, { baseModel, altModel, initialStop =
     e.preventDefault();
     const now = performance.now();
     const dt = Math.max(0.004, (now - touchLastT) / 1000);
-    const curY = e.touches[0].clientY;
-    const dy = touchY - curY; // swipe up (scroll down) -> dy > 0
-    touchY = curY;
+    const t = e.touches[0];
+    const dy = touchY - t.clientY;
+    touchY = t.clientY;
     touchLastT = now;
+
+    view.setTouchLens(t.clientX, t.clientY, true);
 
     if (Math.abs(dy) < 0.2) return;
     const dStops = Math.max(-0.45, Math.min(0.45, dy / 220));
     const instVel = dStops / dt;
     touchVelStops = touchVelStops * 0.45 + instVel * 0.55;
 
-    dialTarget = Math.max(0, dialTarget + dStops);
+    dialTarget += dStops;
     lastInputAt = now;
     view.nudgeSpin(dStops * 0.42, 0);
     view.kick();
@@ -373,12 +379,24 @@ export function attachDiffusionScroll(view, { baseModel, altModel, initialStop =
     isTouching = false;
     touchY = null;
     const now = performance.now();
-    // Apply smooth flick coasting if released shortly after moving
+
     if (now - touchLastT < 90 && Math.abs(touchVelStops) > 0.25) {
       const coast = Math.max(-1.15, Math.min(1.15, touchVelStops * 0.14));
-      dialTarget = Math.max(0, dialTarget + coast);
+      dialTarget += coast;
       lastInputAt = now;
       view.kick();
+    }
+
+    // Brief tap/flick lingers ~160ms so the ASCII pulse is clearly visible, then fades smoothly to 100% ink
+    const heldMs = now - touchStartAt;
+    const lingerMs = Math.max(0, 160 - heldMs);
+    if (lingerMs > 0) {
+      lensReleaseTimer = setTimeout(() => {
+        lensReleaseTimer = 0;
+        view.setTouchLens(0, 0, false);
+      }, lingerMs);
+    } else {
+      view.setTouchLens(0, 0, false);
     }
   }
 
@@ -399,6 +417,7 @@ export function attachDiffusionScroll(view, { baseModel, altModel, initialStop =
       view.kick();
     },
     dispose() {
+      if (lensReleaseTimer) clearTimeout(lensReleaseTimer);
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("touchstart", onTouchStart);

@@ -950,6 +950,7 @@ export function createProteinFold(container, options = {}) {
   }
 
   let lastPX = 0, lastPY = 0;
+  let lastTouchAt = -1e9;
 
   function updatePointerNorm(e) {
     const rect = inner.getBoundingClientRect();
@@ -959,7 +960,8 @@ export function createProteinFold(container, options = {}) {
   }
 
   root.addEventListener("pointerenter", e => {
-    if (!o.interactive || (e.pointerType === "touch" && !o.touchOrbit)) return;
+    if (!o.interactive) return;
+    if (e.pointerType !== "mouse" || performance.now() - lastTouchAt < 800) return;
     pointerInside = true;
     updatePointerNorm(e);
     smoothMX = targetMX;
@@ -968,7 +970,8 @@ export function createProteinFold(container, options = {}) {
   });
 
   root.addEventListener("pointermove", e => {
-    if (!o.interactive || (e.pointerType === "touch" && !o.touchOrbit)) return;
+    if (!o.interactive) return;
+    if (e.pointerType !== "mouse" || performance.now() - lastTouchAt < 800) return;
     pointerInside = true;
     updatePointerNorm(e);
     if (dragging) {
@@ -1110,6 +1113,27 @@ export function createProteinFold(container, options = {}) {
       targetMY = smoothMY = ny;
       hoverAmt = active ? 1 : 0;
       render();
+    },
+    setTouchLens(clientX, clientY, active = true) {
+      lastTouchAt = performance.now();
+      if (!active) {
+        pointerInside = false;
+        kick();
+        return;
+      }
+      const rect = inner.getBoundingClientRect();
+      if (rect.width && rect.height) {
+        const rx = (clientX - rect.left) / rect.width;
+        const ry = (clientY - 24 - rect.top) / rect.height;
+        targetMX = Math.max(0.18, Math.min(0.82, rx));
+        targetMY = Math.max(0.18, Math.min(0.82, ry));
+        if (!pointerInside && hoverAmt < 0.05) {
+          smoothMX = targetMX;
+          smoothMY = targetMY;
+        }
+      }
+      pointerInside = true;
+      kick();
     },
     setScroll(amt) {
       scrollAmt = Math.max(0, Math.min(1, amt));
