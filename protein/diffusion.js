@@ -94,8 +94,8 @@ function extractContacts(model) {
 
 /**
  * Attach scroll-driven de novo protein diffusion & refolding trajectory:
- * Stop 0: 2PAB (prealbumin β-sandwich dimer)
- * Stop 1: SE(3) disordered polypeptide diffusion prior + pairwise restraint graph
+ * Stop 0: 2PAB (prealbumin β-sandwich dimer) — 0% ASCII on mobile at rest
+ * Stop 1: SE(3) disordered polypeptide diffusion prior + pairwise restraint graph (sweeps up to 50% ASCII)
  * Stop 2: 1TIM (de novo-style (β/α)8 TIM barrel enzyme)
  * Stop 3: SE(3) disordered polypeptide diffusion prior + pairwise restraint graph
  */
@@ -104,6 +104,7 @@ export function attachDiffusionScroll(view, { baseModel, altModel, initialStop =
   let dialTarget = initialStop;
   let dialSmooth = initialStop;
   let lastInputAt = -1e9;
+  let isTouching = false;
 
   // Measure natural bounding radii of both folded structures for seamless zero-jump scaling
   view.setModelFast(altModel, null, null);
@@ -222,18 +223,23 @@ export function attachDiffusionScroll(view, { baseModel, altModel, initialStop =
 
   function onTick(dt, now) {
     const idleMs = now - lastInputAt;
-    if (idleMs > 360) {
+    if (!isTouching && idleMs > 320) {
       const snapped = Math.round(dialTarget);
       dialTarget += (snapped - dialTarget) * (1 - Math.exp(-dt * 6.5));
     }
 
-    dialSmooth += (dialTarget - dialSmooth) * (1 - Math.exp(-dt * 10.5));
+    dialSmooth += (dialTarget - dialSmooth) * (1 - Math.exp(-dt * 11.0));
     const u = posMod(dialSmooth, NUM_STOPS);
     latestFrame = updateGeometry(u);
 
+    // Smoothly sweep ASCII into the protein (0% -> up to scrollMax=50%) upon scrolling
+    const asciiProgress = smoothstep(Math.min(1, Math.max(0, Math.abs(dialSmooth))));
+    view.setScrollFast(asciiProgress);
+
     return (
+      isTouching ||
       Math.abs(dialTarget - dialSmooth) > 5e-4 ||
-      (idleMs <= 360 && Math.abs(dialTarget - Math.round(dialTarget)) > 1e-3)
+      (idleMs <= 320 && Math.abs(dialTarget - Math.round(dialTarget)) > 1e-3)
     );
   }
 
@@ -285,8 +291,8 @@ export function attachDiffusionScroll(view, { baseModel, altModel, initialStop =
   }
 
   view.set({ onTick, onBeforeMask });
+  onTick(0.016, performance.now());
   if (initialStop !== 0) {
-    onTick(0.016, performance.now());
     view.render();
   }
 
@@ -297,7 +303,11 @@ export function attachDiffusionScroll(view, { baseModel, altModel, initialStop =
     const delta = Math.abs(rawDy) >= Math.abs(rawDx) ? rawDy : rawDx;
     const dStops = Math.max(-0.55, Math.min(0.55, delta / 280));
 
-    dialTarget += dStops;
+    if (view.getOptions().mode === "scroll") {
+      dialTarget = Math.max(0, dialTarget + dStops);
+    } else {
+      dialTarget += dStops;
+    }
     lastInputAt = performance.now();
     view.nudgeSpin(dStops * 0.42, 0);
     view.kick();
@@ -312,42 +322,72 @@ export function attachDiffusionScroll(view, { baseModel, altModel, initialStop =
       view.kick();
     } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
       e.preventDefault();
-      dialTarget = Math.round(dialTarget) - 1;
+      const next = Math.round(dialTarget) - 1;
+      dialTarget = view.getOptions().mode === "scroll" ? Math.max(0, next) : next;
       lastInputAt = performance.now();
       view.nudgeSpin(-0.35, 0);
       view.kick();
     }
   }
 
-  // Allow vertical swipe outside the 3D drag stage (e.g., over margins/footer on mobile) to morph too
+  // Full-page inertial touch scrolling across the entire viewport (including the protein stage)
   let touchY = null;
+  let touchLastT = 0;
+  let touchVelStops = 0;
+
   function onTouchStart(e) {
-    if (e.touches.length !== 1 || e.target.closest(".protein-fold-stage")) {
+    if (e.touches.length !== 1) {
       touchY = null;
+      isTouching = false;
       return;
     }
     touchY = e.touches[0].clientY;
+    touchLastT = performance.now();
+    touchVelStops = 0;
+    isTouching = true;
   }
+
   function onTouchMove(e) {
     if (touchY === null || e.touches.length !== 1) return;
-    const dy = touchY - e.touches[0].clientY;
-    touchY = e.touches[0].clientY;
-    if (Math.abs(dy) < 0.5) return;
-    const dStops = Math.max(-0.35, Math.min(0.35, dy / 180));
-    dialTarget += dStops;
-    lastInputAt = performance.now();
-    view.nudgeSpin(dStops * 0.35, 0);
+    e.preventDefault();
+    const now = performance.now();
+    const dt = Math.max(0.004, (now - touchLastT) / 1000);
+    const curY = e.touches[0].clientY;
+    const dy = touchY - curY; // swipe up (scroll down) -> dy > 0
+    touchY = curY;
+    touchLastT = now;
+
+    if (Math.abs(dy) < 0.2) return;
+    const dStops = Math.max(-0.45, Math.min(0.45, dy / 220));
+    const instVel = dStops / dt;
+    touchVelStops = touchVelStops * 0.45 + instVel * 0.55;
+
+    dialTarget = Math.max(0, dialTarget + dStops);
+    lastInputAt = now;
+    view.nudgeSpin(dStops * 0.42, 0);
     view.kick();
   }
+
   function onTouchEnd() {
+    if (!isTouching) return;
+    isTouching = false;
     touchY = null;
+    const now = performance.now();
+    // Apply smooth flick coasting if released shortly after moving
+    if (now - touchLastT < 90 && Math.abs(touchVelStops) > 0.25) {
+      const coast = Math.max(-1.15, Math.min(1.15, touchVelStops * 0.14));
+      dialTarget = Math.max(0, dialTarget + coast);
+      lastInputAt = now;
+      view.kick();
+    }
   }
 
   window.addEventListener("wheel", onWheel, { passive: false });
   window.addEventListener("keydown", onKeyDown);
   window.addEventListener("touchstart", onTouchStart, { passive: true });
-  window.addEventListener("touchmove", onTouchMove, { passive: true });
+  window.addEventListener("touchmove", onTouchMove, { passive: false });
   window.addEventListener("touchend", onTouchEnd, { passive: true });
+  window.addEventListener("touchcancel", onTouchEnd, { passive: true });
 
   return {
     setStop(stopVal) {
@@ -364,6 +404,7 @@ export function attachDiffusionScroll(view, { baseModel, altModel, initialStop =
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchEnd);
     },
   };
 }

@@ -29,6 +29,9 @@ export const DEFAULTS = {
   rotY: 0.42,
   zoom: 1.0,
   interactive: true,
+  dragOrbit: true,
+  touchOrbit: true,
+  externalScroll: false,
 
   // Option 2C interactive blend modes:
   // "lens" | "scroll" | "both" | "curtain" | "split" | "ink" | "ascii"
@@ -128,7 +131,7 @@ export function createProteinFold(container, options = {}) {
   const root = document.createElement("div");
   root.className = "protein-fold-stage";
   root.style.cssText =
-    "position:absolute;inset:0;overflow:hidden;display:flex;align-items:center;justify-content:center;user-select:none;-webkit-user-select:none;touch-action:none;";
+    "position:absolute;inset:0;overflow:hidden;display:flex;align-items:center;justify-content:center;user-select:none;-webkit-user-select:none;touch-action:pinch-zoom;";
   root.setAttribute("role", "img");
 
   const inner = document.createElement("div");
@@ -209,7 +212,7 @@ export function createProteinFold(container, options = {}) {
     out.style.color = o.ink;
     out.style.fontFamily = probe.style.fontFamily = o.font;
     root.style.background = o.transparent ? "transparent" : o.paper;
-    root.style.cursor = o.interactive ? "grab" : "default";
+    root.style.cursor = o.interactive && o.dragOrbit ? "grab" : "default";
     inkPalette = buildInkPalette(o.ink, o.paper);
   }
 
@@ -874,7 +877,7 @@ export function createProteinFold(container, options = {}) {
     smoothMX += (targetMX - smoothMX) * posRate;
     smoothMY += (targetMY - smoothMY) * posRate;
 
-    if (o.mode === "scroll" || o.mode === "both") updateScroll();
+    if ((o.mode === "scroll" || o.mode === "both") && !o.externalScroll) updateScroll();
 
     if (!dragging) {
       const baseOmega = o.period > 0.1 ? (Math.PI * 2) / o.period : 0;
@@ -931,7 +934,7 @@ export function createProteinFold(container, options = {}) {
   if (ro) ro.observe(root);
 
   const onWinScroll = () => {
-    if (o.mode === "scroll" || o.mode === "both") {
+    if ((o.mode === "scroll" || o.mode === "both") && !o.externalScroll) {
       updateScroll();
       kick();
     }
@@ -956,7 +959,7 @@ export function createProteinFold(container, options = {}) {
   }
 
   root.addEventListener("pointerenter", e => {
-    if (!o.interactive) return;
+    if (!o.interactive || (e.pointerType === "touch" && !o.touchOrbit)) return;
     pointerInside = true;
     updatePointerNorm(e);
     smoothMX = targetMX;
@@ -965,7 +968,7 @@ export function createProteinFold(container, options = {}) {
   });
 
   root.addEventListener("pointermove", e => {
-    if (!o.interactive) return;
+    if (!o.interactive || (e.pointerType === "touch" && !o.touchOrbit)) return;
     pointerInside = true;
     updatePointerNorm(e);
     if (dragging) {
@@ -989,7 +992,7 @@ export function createProteinFold(container, options = {}) {
   });
 
   root.addEventListener("pointerdown", e => {
-    if (!o.interactive || (e.pointerType === "mouse" && e.button !== 0)) return;
+    if (!o.interactive || !o.dragOrbit || (e.pointerType === "touch" && !o.touchOrbit) || (e.pointerType === "mouse" && e.button !== 0)) return;
     root.setPointerCapture(e.pointerId);
     dragging = true;
     pointerInside = true;
@@ -1069,7 +1072,7 @@ export function createProteinFold(container, options = {}) {
       Object.assign(o, nextOpts);
       if (nextOpts.tiltX !== undefined && !dragging) rotX = o.tiltX;
       if (nextOpts.zoom !== undefined) zoom = o.zoom;
-      if (nextOpts.mode === "scroll" || nextOpts.mode === "both") updateScroll();
+      if ((nextOpts.mode === "scroll" || nextOpts.mode === "both") && !o.externalScroll) updateScroll();
       applyStyle();
       if (nextOpts.detail !== undefined && nextOpts.detail !== prevDetail) fit();
       render();
@@ -1111,6 +1114,9 @@ export function createProteinFold(container, options = {}) {
     setScroll(amt) {
       scrollAmt = Math.max(0, Math.min(1, amt));
       render();
+    },
+    setScrollFast(amt) {
+      scrollAmt = Math.max(0, Math.min(1, amt));
     },
     getText() {
       return lastText;

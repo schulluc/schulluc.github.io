@@ -70,7 +70,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
   <div class="viewport">
@@ -99,24 +99,27 @@
   </div>
 
   <script type="module">
-    import { createProteinFold } from "./protein/engine.js?v=7";
-    import PAB_AB from "./protein/structures/2pab-ab.js?v=7";
-    import TIM_A from "./protein/structures/1tim-a.js?v=7";
-    import { attachDiffusionScroll } from "./protein/diffusion.js?v=7";
+    import { createProteinFold } from "./protein/engine.js?v=8";
+    import PAB_AB from "./protein/structures/2pab-ab.js?v=8";
+    import TIM_A from "./protein/structures/1tim-a.js?v=8";
+    import { attachDiffusionScroll } from "./protein/diffusion.js?v=8";
 
     const params = new URLSearchParams(window.location.search);
     const noHoverMedia = window.matchMedia("(hover: none), (pointer: coarse)");
 
     function resolveMode() {
       if (params.has("mode")) return params.get("mode");
-      return noHoverMedia.matches ? "split" : "lens";
+      return noHoverMedia.matches ? "scroll" : "lens";
     }
 
     const period = params.has("period") ? Number(params.get("period")) : 16;
     const stage = document.getElementById("foldStage");
     const view = createProteinFold(stage, {
       mode: resolveMode(),
-      splitPos: 0.50,
+      scrollMax: 0.50,
+      externalScroll: true,
+      dragOrbit: false,
+      touchOrbit: false,
       lensRadius: 0.30,
       asciiStyle: "hybrid",
       detail: 90,

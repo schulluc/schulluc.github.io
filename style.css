@@ -34,6 +34,7 @@ body {
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
+  touch-action: pinch-zoom;
 }
 
 /* Dynamic full-bleed protein stage taking all remaining screen height */
@@ -53,6 +54,7 @@ body {
   height: 100%;
   max-width: 1160px;
   background: var(--bg);
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Minimal Google Sans footer anchored at the bottom */
